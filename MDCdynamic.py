@@ -12,7 +12,7 @@ from concurrent.futures import ThreadPoolExecutor as Pool
 #cur_path = os.path.dirname(os.path.realpath(__file__))
 #config_path = os.path.join(cur_path,'config.ini')
 conf = configparser.ConfigParser()
-config_path = "C:/Users/jinp.jiang/Desktop/python/config.ini"
+config_path = "./config.ini"
 conf.read(config_path)
 
 #Sync information
@@ -58,11 +58,13 @@ def MDCIPList():
     return playerIPList
 
 def concurrent():
-    playerList = MDCIPList()
+    #playerList = MDCIPList()
     #print(playerList[0])
     #sendDatatoBS(playerList[0])
-    pool = Pool(max_workers=1)
-    pool.map(sendDatatoBS,playerList)
+    #pool = Pool(max_workers=1)
+    #pool.map(sendDatatoBS,playerList)
+    ip = "127.0.0.1"
+    sendDatatoBS("127.0.0.1")
 
 def timerFun(scheduleTimer):
     print (scheduleTimer)
@@ -80,16 +82,23 @@ def timerFun(scheduleTimer):
                 scheduleTimer = scheduleTimer + datetime.timedelta(seconds=10)
                 flag = 0
 
-def serailSignal():
-    sint = serial.Serial('/dev/ttyS0',9600,timeout=0.5)
-    data = ''
+def serailSignal2():
+    x=serial.Serial('/dev/ttyS0',9600,timeout=1)
+    print(x.inWaiting())
     while True:
-        while sint.inWaiting() > 0: 
-            data += sint.read(1) 
-        if data != '': 
-            print (data)
-            concurrent()
-
+        while x.inWaiting()>0:
+            myout=x.read(7)
+            print(myout.decode('gbk'))
+            data = myout.decode('gbk')
+            datas=''.join(map(lambda x:('/x' if len(hex(x))>=4 else '/x0')+hex(x)[2:],myout))
+            print(datas)
+            new_datas=datas[2:].split('/x')
+            print(new_datas)
+            if data == "abcdefg":
+                concurrent()
+            else:
+                print("info error")
+    
 def serailSignal():
     now = datetime.datetime.now().replace(microsecond=0)
     sint = serial.Serial('/dev/ttyS0',9600,timeout=0.5)
@@ -106,5 +115,5 @@ if __name__ == '__main__':
     #scheduleTimer = datetime.datetime(2021,1,26,11,39,10)
     #print("run the timer task at {}".format(scheduleTimer))
     #timerFun(scheduleTimer)
-    concurrent()
-    #serailSignal()
+    serailSignal2()
+    #concurrent()
