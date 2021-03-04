@@ -131,7 +131,16 @@ def serailSignal2():
             new_datas=datas[2:].split('/x')
             print(new_datas)
             if data == "abcdefg":
-                concurrent()
+                now = datetime.datetime.now().replace(microsecond=0)
+                start = datetime.datetime.strptime(str(startTime),"%Y-%m-%d %H:%M:%S")
+                end = datetime.datetime.strptime(str(endTime),"%Y-%m-%d %H:%M:%S")
+                if start <= now <= end:
+                    concurrent()
+                    sleepTime = duration/1000
+                    print(sleepTime,type(sleepTime))
+                    time.sleep(sleepTime)
+                else:
+                    print("date error")
             else:
                 print("info error")
     
